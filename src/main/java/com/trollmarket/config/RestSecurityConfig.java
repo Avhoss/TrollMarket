@@ -29,6 +29,8 @@ public class RestSecurityConfig {
         http.antMatcher("/api/**").csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/authenticate").permitAll()
+                .antMatchers("/api/registerForm").permitAll()
+                .antMatchers("/api/registerAdmin").hasAuthority("Administrator")
                 .antMatchers("/profile/**").hasAnyAuthority("Buyer","Seller")
                 .antMatchers("/merchandise/**").hasAuthority("Seller")
                 .antMatchers("/shop/**","/mycart/**").hasAuthority("Buyer")

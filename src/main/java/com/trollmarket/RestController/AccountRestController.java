@@ -1,23 +1,31 @@
 package com.trollmarket.RestController;
 
+import antlr.StringUtils;
 import com.trollmarket.config.ApplicationUserDetails;
 import com.trollmarket.config.authentication.CustomAuthenticationProvider;
+import com.trollmarket.dto.account.RegisterAdminDTO;
+import com.trollmarket.dto.account.RegisterDTO;
 import com.trollmarket.dto.account.RequestTokenDTO;
 import com.trollmarket.dto.account.ResponseTokenDTO;
 import com.trollmarket.service.AccountService;
+import com.trollmarket.service.BuyerService;
+import com.trollmarket.service.SellerService;
 import com.trollmarket.utility.JwtToken;
+import com.trollmarket.utility.Utilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
@@ -34,6 +42,12 @@ public class AccountRestController {
 
     @Autowired
     private JwtToken jwtToken;
+
+    @Autowired
+    private BuyerService buyerService;
+
+    @Autowired
+    private SellerService sellerService;
 
     @Autowired
     private CustomAuthenticationProvider customAuthenticationProvider;
@@ -72,6 +86,52 @@ public class AccountRestController {
         ResponseTokenDTO responseTokenDTO = new ResponseTokenDTO(dto.getUsername(), dto.getRole(), token);
 
         return responseTokenDTO;
+    }
+
+
+    @PostMapping("/registerForm")
+    public ResponseEntity<String> registerForm(
+            @RequestBody RegisterDTO registerDTO
+    ){
+        if(registerDTO.getRole().toLowerCase().equals("buyer")){
+
+            registerDTO.setRole(Utilities.capitalizeFirstChar(registerDTO.getRole()));
+
+            buyerService.save(registerDTO);
+
+            return new ResponseEntity<>("Successfully added buyer!", HttpStatus.ACCEPTED);
+        }
+        else if(registerDTO.getRole().toLowerCase().equals("seller")){
+
+
+            registerDTO.setRole(Utilities.capitalizeFirstChar(registerDTO.getRole()));
+            sellerService.save(registerDTO);
+
+            return new ResponseEntity<>("Successfully added seller!", HttpStatus.ACCEPTED);
+        }
+        else {
+            return new ResponseEntity<>("Something wrong just happened in register", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/registerAdmin")
+    public ResponseEntity<String> registerAdmin(
+            @RequestBody RegisterAdminDTO registerAdminDTO
+            ){
+
+        if(registerAdminDTO.getRole().toLowerCase().equals("administrator")){
+
+
+            registerAdminDTO.setRole(Utilities.capitalizeFirstChar(registerAdminDTO.getRole()));
+
+            accountService.registerAccount(registerAdminDTO);
+
+            return new ResponseEntity<>("Successfully added Admin!", HttpStatus.ACCEPTED);
+        }
+        else {
+            return new ResponseEntity<>("Something went wrong, could be typo in role", HttpStatus.BAD_REQUEST);
+        }
+
     }
 
 }
