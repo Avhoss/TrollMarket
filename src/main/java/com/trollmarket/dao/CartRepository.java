@@ -30,4 +30,18 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
            """
    )
    List<Cart> findCartsBuyer(@Param("username") String username);
+
+   @Query("""
+           SELECT c
+           FROM Cart as c
+           WHERE c.product.id = :id
+           """)
+   List<Cart> findCartByProduct(@Param("id") Long id);
+
+   @Query("""
+           SELECT c
+           FROM Cart as c
+           WHERE c.shipment.id = :id
+           """)
+   List<Cart> findCartByShipment(@Param("id") Long id);
 }

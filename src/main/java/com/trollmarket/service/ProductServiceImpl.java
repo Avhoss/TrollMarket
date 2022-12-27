@@ -81,7 +81,11 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public void delete(Long id) {
-
+        if(cartRepository.findCartByProduct(id).size() > 0){
+            cartRepository.findCartByProduct(id).forEach(cart -> {
+                cartRepository.deleteById(cart.getId());
+            });
+        }
         productRepository.deleteById(id);
     }
 
@@ -104,8 +108,7 @@ public class ProductServiceImpl implements ProductService{
         List<Product> products = productsPageable.getContent();
 
         for(Product pro : products){
-            if(productRepository.countOrderProduct(pro.getId()) > 0 ||
-                productRepository.countCartProduct(pro.getId()) > 0 ){
+            if(productRepository.countOrderProduct(pro.getId()) > 0){
                 pro.setOrder(true);
             }else{
                 pro.setOrder(false);
