@@ -26,6 +26,17 @@ public class RestControllerException {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(ShipmentDepedencyException e) {
+
+        ErrorResponse response = new ErrorResponse();
+        response.setMessage(e.getMessage());
+        response.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
+        response.setTimeStamp(System.currentTimeMillis());
+        response.setKeterangan("eror dari ShipmentDepedencyException");
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_ACCEPTABLE);
+    }
     //akan dijalankan otomatis ketika ada runtime exception, misal memasukkan nilai tidak sesuai tipe data
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException(RuntimeException e) {

@@ -29,5 +29,17 @@ public interface ShipmentRepository extends JpaRepository<Shipment, Long> {
             """)
     Page<GetShipmentDTO> findAllShipment(Pageable pageable);
 
+    @Query("""
+            SELECT new com.trollmarket.dto.shipment.GetShipmentDTO(
+            s.id,s.name,s.price,s.service,COUNT(od.id))
+            FROM OrderDetail AS od
+                FULL JOIN od.shipment as s
+            WHERE s.id = :id
+            GROUP BY s.id,s.name,s.price,s.service
+            
+            """)
+    GetShipmentDTO findGetShiptmentDTOById(Long id);
+
+
 }
 

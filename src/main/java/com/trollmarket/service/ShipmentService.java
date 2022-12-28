@@ -21,4 +21,5 @@ public interface ShipmentService {
 
     List<Shipment> findAllShipmentService();
 
+    Shipment findById(Long id);
 }
