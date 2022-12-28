@@ -31,7 +31,7 @@ public class RestProfileController {
 
     @GetMapping("/index")
     public ResponseEntity<GetProfilDTO> profile(@RequestParam(defaultValue = "1") Integer page,
-                                                Authentication authentication, Model model){
+                                                Authentication authentication){
 
         String role = authentication.getAuthorities().toArray()[0].toString().toLowerCase();
         if(role.equals("buyer")){

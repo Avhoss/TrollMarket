@@ -2,6 +2,7 @@ package com.trollmarket.service;
 
 import com.trollmarket.dao.*;
 import com.trollmarket.dto.myCart.CartDTO;
+import com.trollmarket.dto.myCart.CartDtoNoBuyerId;
 import com.trollmarket.entity.*;
 import com.trollmarket.exceptionhandler.InsufficientFundsException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,25 @@ public class CartServiceImpl implements CartService{
 
     @Override
     public void saveCart(CartDTO cartDTO,  String usernameBuyer, Long productID) {
+        Cart cart = new Cart(
+                buyerRepository.findByUsername(usernameBuyer),
+                productRepository.findById(productID).get(),
+                cartDTO.getQuantity(),
+                shipmentRepository.findById(cartDTO.getShipmentID()).get()
+        );
+
+        Cart findCart = productRepository.findCartTheSameProduct(productID, cart.getShipment().getId(), cart.getBuyer().getId());
+        if(findCart != null){
+            findCart.setQuantity(findCart.getQuantity() + cart.getQuantity());
+            findCart.totalPriceInBigDecimal().add(cart.totalPriceInBigDecimal());
+            cartRepository.save(findCart);
+        }else{
+            cartRepository.save(cart);
+        }
+    }
+
+    @Override
+    public void saveCart(CartDtoNoBuyerId cartDTO, String usernameBuyer, Long productID) {
         Cart cart = new Cart(
                 buyerRepository.findByUsername(usernameBuyer),
                 productRepository.findById(productID).get(),
