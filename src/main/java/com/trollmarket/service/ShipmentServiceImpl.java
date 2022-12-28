@@ -1,5 +1,7 @@
 package com.trollmarket.service;
+import com.trollmarket.dao.CartRepository;
 import com.trollmarket.dao.ShipmentRepository;
+import com.trollmarket.dto.shipment.GetShipmentDTO;
 import com.trollmarket.dto.shipment.UpsertShipmentDTO;
 import com.trollmarket.entity.Shipment;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,24 +19,15 @@ public class ShipmentServiceImpl implements ShipmentService{
     @Autowired
     ShipmentRepository shipmentRepository;
 
+    @Autowired
+    CartRepository cartRepository;
 
     private final int rowsInPage = 5;
 
-    @Override
-    public List<Shipment> findAllShipment() {
-        return shipmentRepository.findAll();
-    }
 
-    @Override
-    public Page<Shipment> findAllShipmentPageable(int page) {
-        Pageable pagination = PageRequest.of(page - 1, rowsInPage, Sort.by("id"));
-
-        return shipmentRepository.findAll(pagination);
-    }
-
-    public Page<Shipment> findAllShipment(Integer page) {
-        Pageable pagination = PageRequest.of(page - 1, rowsInPage, Sort.by("id"));
-        return shipmentRepository.findAll(pagination);
+    public Page<GetShipmentDTO> findAllShipment(Integer page) {
+        Pageable pagination = PageRequest.of(page - 1, rowsInPage, Sort.by("s.id"));
+        return shipmentRepository.findAllShipment(pagination);
     }
 
     @Override
@@ -49,6 +42,16 @@ public class ShipmentServiceImpl implements ShipmentService{
             shipment.setService(shipmentRepository.findById(upsertShipmentDTO.getId()).get().getService());
         }
         shipmentRepository.save(shipment);
+    }
+
+    @Override
+    public void delete(Long id) {
+        if(cartRepository.findCartByShipment(id).size() > 0){
+            cartRepository.findCartByShipment(id).forEach(cart -> {
+                    cartRepository.deleteById(cart.getId());
+            });
+        }
+        shipmentRepository.deleteById(id);
     }
 
     @Override

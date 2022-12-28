@@ -48,6 +48,12 @@ public class ShipmentController {
         return "redirect:/shipment/index?page="+page;
     }
 
+    @GetMapping("delete")
+    public String delete(@RequestParam Long id,@RequestParam Integer page){
+        shipmentService.delete(id);
+        return "redirect:/shipment/index?page="+page;
+    }
+
     @GetMapping("/edit")
     @ResponseBody
     public UpsertShipmentDTO editForm(@RequestParam Long id){
@@ -56,4 +62,5 @@ public class ShipmentController {
         }
         return shipmentService.findUpsertShipmentById(id);
     }
+
 }
