@@ -31,8 +31,10 @@
                 <tbody>
                 <tr th:each="shipment: ${shipments}">
                     <td>
-                        <a class="btn-action" href="javascript:;" th:onclick="fetchShipment([[${shipment.id}]])" id="edit-shipment">Edit</a>
-                        <a class="btn-action" th:href="@{/shipment/delete(id=${shipment.id})}">Delete</a>
+                        <a th:if="${shipment.getTotalTransaction()} <= 0" class="btn-action" href="javascript:;" th:onclick="fetchShipment([[${shipment.id}]])" id="edit-shipment">Edit</a>
+                        <a th:if="${shipment.getTotalTransaction()} > 0" th:class="button-disable-merchandise" >Edit</a>
+                        <a th:if="${shipment.getTotalTransaction()} > 0" th:class="button-disable-merchandise" th:href="@{/shipment/delete(id=${shipment.id})}">Delete</a>
+                        <a th:if="${shipment.getTotalTransaction()} <= 0" class="btn-action" th:href="@{/shipment/delete(id=${shipment.id},page=${currentPage})}">Delete</a>
                         <a th:if="${shipment.getStatus()}=='Yes'" th:class="btn-action" th:href="@{/shipment/updateService(id = ${shipment.id},page = ${currentPage})}">Service</a>
                         <a th:if="${shipment.getStatus()}=='No'" th:class="button-disable-merchandise"   th:href="@{/shipment/discontinue(id = ${shipment.id})}">Service</a>
                     </td>

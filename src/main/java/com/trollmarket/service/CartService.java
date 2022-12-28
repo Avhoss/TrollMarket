@@ -1,6 +1,7 @@
 package com.trollmarket.service;
 
 import com.trollmarket.dto.myCart.CartDTO;
+import com.trollmarket.dto.myCart.CartDtoNoBuyerId;
 import com.trollmarket.entity.Cart;
 import org.springframework.data.domain.Page;
 
@@ -10,6 +11,9 @@ public interface CartService {
 
     Cart findById(Long id);
     void saveCart(CartDTO cartDTO, String usernameBuyer, Long ProductID);
+
+    void saveCart(CartDtoNoBuyerId cartDTO, String usernameBuyer, Long ProductID);
+
 
     List<Cart> findAllCart();
 
