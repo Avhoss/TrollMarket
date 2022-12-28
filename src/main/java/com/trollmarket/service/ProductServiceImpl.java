@@ -7,6 +7,7 @@ import com.trollmarket.dto.product.ProductDTO;
 import com.trollmarket.entity.Cart;
 import com.trollmarket.entity.Product;
 import com.trollmarket.entity.Seller;
+import com.trollmarket.exceptionhandler.ObjectNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +36,15 @@ public class ProductServiceImpl implements ProductService{
     public void save(ProductDTO dto, String username) {
         Seller seller =  sellerRepository.findByUsername(username);
 
+        if(dto.getDiscontinue() == null) {
+            dto.setDiscontinue(Boolean.FALSE);
+        }
+
+        if(dto.getId() != null &&
+                productRepository.findProductSellerById(seller.getId(), dto.getId()) == 0){
+                throw new RuntimeException("Seller " + seller.getFullName() + " tidak memiliki produk dengan id " + dto.getId());
+        }
+
         Product product = new Product(
                 dto.getId(),
                 seller,
@@ -42,7 +52,8 @@ public class ProductServiceImpl implements ProductService{
                 dto.getCategory(),
                 dto.getDescription(),
                 dto.getPrice(),
-                dto.getDiscontinue()
+                dto.getDiscontinue(),
+                Boolean.FALSE
         );
 //        if(dto.getId()!=null){
 //            product.setDiscontinue(productRepository.findById(dto.getId()).get().getDiscontinue());
@@ -120,4 +131,25 @@ public class ProductServiceImpl implements ProductService{
         return productRepository.findAllProductBySeller(username,pagination);
     }
 
+    @Override
+    public Product findProductSellerById(Long id, String username) {
+        List<Product> allProductSeller = productRepository.findAllProductBySeller(username,Pageable.unpaged()).getContent();
+        Product product = null;
+        for(Product prod : allProductSeller){
+            if(prod.getId() == id){
+                product = prod;
+            }
+        }
+
+        if(product == null){
+            throw new ObjectNotFound("product with id " + id + " not found");
+        }
+
+        return product;
+    }
+
+    @Override
+    public Long CountProductSellerById(Long sellerID, Long productID) {
+        return productRepository.findProductSellerById(sellerID, productID);
+    }
 }

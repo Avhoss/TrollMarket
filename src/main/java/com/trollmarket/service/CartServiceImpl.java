@@ -107,6 +107,7 @@ public class CartServiceImpl implements CartService{
         order.setBuyer(buyer);
         orderRepository.save(order);
 
+
         for(Cart c : allCart){
           buyer.setBalance(buyer.getBalance().subtract(c.totalPriceInBigDecimal()));
           Seller seller = c.getProduct().getSeller();

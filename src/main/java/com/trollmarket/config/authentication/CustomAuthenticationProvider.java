@@ -33,16 +33,36 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String selectedRole = request.getParameter("role");
         UserDetails userDetails = userDetailsService.loadUserByUsername(authentication.getName());
 
-        if(!passwordEncoder.matches(authentication.getCredentials().toString(), userDetails.getPassword())){
+        if(selectedRole != null) {
+            if (!passwordEncoder.matches(authentication.getCredentials().toString(), userDetails.getPassword())) {
+                throw new CustomAuthenticationException("Invalid Username or Password");
+
+            } else if (passwordEncoder.matches(authentication.getCredentials().toString(), userDetails.getPassword())
+                    && !selectedRole.equals(userDetails.getAuthorities().toArray()[0].toString())) {
+                throw new CustomAuthenticationException("Role is Invalid");
+
+            } else {
+                return new UsernamePasswordAuthenticationToken(userDetails.getUsername()
+                        , userDetails.getPassword()
+                        , userDetails.getAuthorities());
+            }
+        }
+
+        if (!passwordEncoder.matches(authentication.getCredentials().toString(), userDetails.getPassword())) {
+
             throw new CustomAuthenticationException("Invalid Username or Password");
 
-        }else if (passwordEncoder.matches(authentication.getCredentials().toString(), userDetails.getPassword())
-                && !selectedRole.equals(userDetails.getAuthorities().toArray()[0].toString())) {
+        } else if (passwordEncoder.matches(authentication.getCredentials().toString(), userDetails.getPassword())
+                && !authentication
+                    .getAuthorities().toArray()[0].toString()
+                    .equals(userDetails.getAuthorities().toArray()[0].toString())) {
+
             throw new CustomAuthenticationException("Role is Invalid");
 
-        }else{
-            return new UsernamePasswordAuthenticationToken(userDetails.getUsername(),userDetails.getPassword()
-                    ,userDetails.getAuthorities());
+        } else {
+            return new UsernamePasswordAuthenticationToken(userDetails.getUsername()
+                    , userDetails.getPassword()
+                    , userDetails.getAuthorities());
         }
     }
 

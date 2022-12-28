@@ -72,4 +72,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAllProductBySeller(@Param("username") String username,
                                          Pageable pageable);
 
+    @Query("""
+            SELECT COUNT(pro)
+            FROM Product as pro
+            WHERE pro.seller.id =:sellerID AND pro.id = :productID
+            """)
+    Long findProductSellerById(@Param("sellerID") Long sellerID, @Param("productID") Long productID);
+
 }
