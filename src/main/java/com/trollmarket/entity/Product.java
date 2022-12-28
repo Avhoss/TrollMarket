@@ -41,7 +41,7 @@ public class Product {
 
     public Product(){}
 
-    public Product(Long id, Seller seller, String name, String category, String description, BigDecimal price, Boolean discontinue) {
+    public Product(Long id, Seller seller, String name, String category, String description, BigDecimal price, Boolean discontinue, Boolean isOrder) {
         this.id = id;
         this.seller = seller;
         this.name = name;
@@ -49,6 +49,7 @@ public class Product {
         this.description = description;
         this.price = price;
         this.discontinue = discontinue;
+        this.isOrder = isOrder;
     }
 
     public Product(Long id, String name, String category, String description, BigDecimal price, Boolean discontinue) {
