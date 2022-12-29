@@ -2,6 +2,7 @@ package com.trollmarket.RestController;
 
 import com.trollmarket.dto.profile.GetProfilDTO;
 import com.trollmarket.dto.profile.TopupDTO;
+import com.trollmarket.entity.Order;
 import com.trollmarket.entity.OrderDetail;
 import com.trollmarket.service.BuyerService;
 import com.trollmarket.service.SellerService;
@@ -29,7 +30,7 @@ public class RestProfileController {
     @Autowired
     private SellerService sellerService;
 
-    @GetMapping("/index")
+    @GetMapping
     public ResponseEntity<GetProfilDTO> profile(@RequestParam(defaultValue = "1") Integer page,
                                                 Authentication authentication){
 
@@ -40,6 +41,26 @@ public class RestProfileController {
         }else {
             GetProfilDTO sellerDTO = sellerService.findProfilByUsername(authentication.getName());
             return new ResponseEntity<>(sellerDTO, HttpStatus.FOUND);
+        }
+
+    }
+
+    @GetMapping("/transactionHistory")
+    public ResponseEntity<Page<OrderDetail>> profileTransaction(@RequestParam(defaultValue = "1") Integer page,
+                                               Authentication authentication){
+
+        String role = authentication.getAuthorities().toArray()[0].toString().toLowerCase();
+
+        if(role.equals("buyer")){
+
+            Page<OrderDetail> allTransactionBuyer = buyerService.findAllTransactionBuyer(page, authentication.getName());
+
+            return new ResponseEntity<>(allTransactionBuyer, HttpStatus.FOUND);
+        }else {
+
+            Page<OrderDetail> allTransactionSeller = sellerService.findAllTransactionSeller(page, authentication.getName());
+
+            return new ResponseEntity<>(allTransactionSeller, HttpStatus.FOUND);
         }
 
     }

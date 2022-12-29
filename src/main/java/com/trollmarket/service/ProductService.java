@@ -26,4 +26,7 @@ public interface ProductService {
     void orderedProduct(String username);
     Page<Product> findAllProductBySeller(String username,Integer page);
 
+    Product findProductSellerById(Long id, String username);
+
+    Long CountProductSellerById(Long sellerID, Long productID);
 }
